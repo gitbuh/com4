@@ -1,0 +1,18 @@
+#!/bin/bash
+
+path="`pwd`";
+html="$path/../test/index.html"
+
+rm -r "$path/../test/js/"
+mkdir "$path/../test/js/"
+
+echo "<html><head>" > "$html"
+
+for dir in ../../commonjs/tests/modules/1.0/*; do
+
+  `cd $dir; com4 -t -i program -o $path/../test/js/$( basename $dir ).js`
+  echo "<script src=\"js/$( basename $dir ).js\"></script>" >> "$html"
+
+done
+
+echo "</head><body></body></html>" >> "$html"
