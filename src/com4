@@ -1,0 +1,71 @@
+#!/bin/bash
+
+export program="CoM4"
+export usage="Usage: $0 -i <in_file.js> -o <out_file.js>";
+export com4_path="$( dirname $( readlink -f "$0" ))"
+export included_files="included_files.tmp"
+export tmp_path="_tmp"
+export abs_path=""
+export rel_path=""
+export include=""
+export in_file=""
+export out_file=""
+export fail=0;
+export test_mode=0;
+export html=0;
+export var_global="window"
+export var_main=""
+
+. "$com4_path/include.sh"
+
+get_options "$@"
+
+mkdir "$tmp_path"
+
+echo -n > "$out_file"
+echo -n > "$included_files"
+
+abs_path="`normalize_path $( dirname "$in_file" )`"; 
+rel_path="$abs_path"; 
+
+id="`basename "$in_file"`";
+
+if [ $html = 1 ]; then
+  echo "<html><head><script>" >> "$out_file";
+fi
+
+if [ $test_mode = 1 ]; then
+  echo "function print(text){ console.log(text); }" >> "$out_file";
+fi
+
+if [ "$var_main" != "" ]; then
+  echo -n "$var_main = " >> "$out_file";
+fi
+
+echo "({modules:[ ">> "$out_file";
+
+write_module "$id" 1 >> "$out_file";
+
+for file in $( ls $tmp_path ); do
+
+  cat "$tmp_path/$file" >> "$out_file";
+
+done
+
+echo "
+//
+// $program bootstrap
+//
+0],init:function(){
+var boot=this, exports=[], require=function(id){ return exports[id] || void boot.modules[id](require, id ? {id:id} : require.main, exports[id]={}) || exports[id]; };
+require.main={id:0};
+return require(0);
+}}).init();" >> "$out_file";
+
+if [ $html = 1 ]; then
+  echo "</script></head><body></body></html>" >> "$out_file";
+fi
+
+rm "$included_files"
+rm -r "$tmp_path"
+
