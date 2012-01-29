@@ -59,6 +59,11 @@ write_module ()
   old_path="$rel_path"
   rel_path=$( dirname "$path" )
   
+  if [ "$2" = "inline" ]; then
+    echo -n "`cat "$path"`"
+    return
+  fi
+  
   count=0
   
   if [ $2 ]; then
@@ -93,13 +98,13 @@ write_module ()
   
   if [ -e "$path" ]; then
   
-    echo "function(require, module, exports){ " >> "$tmp_file"
+    echo "function(require,module,exports){" >> "$tmp_file"
     m4 -P "$com4_path/macros.m4" "$path" >> "$tmp_file"
     echo "},"  >> "$tmp_file"
   
   else
   
-    echo ",// Module \"$module_name\" not found." >> "$tmp_file"
+    echo "0,// Module \"$module_name\" not found." >> "$tmp_file"
     echo "Warning: Module \"$module_name\" not found." >&2
   
   fi

@@ -1,0 +1,6 @@
+[submodule "inc/lib/highlight"]
+	path = inc/lib/highlight
+	url = https://github.com/isagalaev/highlight.js.git
+[submodule "inc/lib/swfobject"]
+	path = inc/lib/swfobject
+	url = https://github.com/swfobject/swfobject.git

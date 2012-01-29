@@ -35,14 +35,14 @@ if [ $html = 1 ]; then
 fi
 
 if [ $test_mode = 1 ]; then
-  echo "function print(text){ console.log(text); }" >> "$out_file";
+  echo "function print(text) { console.log(text); }" >> "$out_file";
 fi
 
 if [ "$var_main" != "" ]; then
   echo -n "$var_main = " >> "$out_file";
 fi
 
-echo "({modules:[ ">> "$out_file";
+echo "({modules: [">> "$out_file";
 
 write_module "$id" 1 >> "$out_file";
 
@@ -57,7 +57,7 @@ echo "
 // $program bootstrap
 //
 0],init:function(){
-var boot=this, exports=[], require=function(id){ return exports[id] || void boot.modules[id](require, id ? {id:id} : require.main, exports[id]={}) || exports[id]; };
+var boot=this, exports=[], require=function(id) { var fn=boot.modules[id]; return exports[id] || void fn(require, id ? {id:id} : require.main, exports[id]={}) || exports[id]; };
 require.main={id:0};
 return require(0);
 }}).init();" >> "$out_file";

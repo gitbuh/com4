@@ -1,46 +1,56 @@
 <!DOCTYPE HTML> 
 <html>
 <head>
-<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono|Ubuntu|Oswald' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Play|Ubuntu+Mono' rel='stylesheet' type='text/css'>
 <style>
-body, html { margin:0; padding:0; height:100%;  }
+body, html { margin:0; padding:0; }
 body { 
-  background-color:#212119; background-image:url(bg.png); background-repeat:repeat-y;
-  color:#757558; font-size:13px; font-family:'Ubuntu', 'Helvetica', sans-serif; 
+  background:#000; color:#838363; font-size:14px; font-family:'Play', 'Helvetica', sans-serif; 
+  text-shadow:1px 1px 2px #000;
 }
-h1, h2 {font-weight: bold; font-family:'Oswald', 'Impact', sans-serif; }
-h1 { font-size: 60px; margin:0; padding:0; line-height:100%;}
-h2 { font-size:20px;}
-.tagline {font-weight:bold; font-size:14px;}
-.side {float: left; width:220px; text-align:center; margin-right: 10px; min-height:100%; position:fixed;}
+h1, h2 { color: #494937; }
+h1 { font-weight: bold; font-size: 60px; margin:0; padding:0; line-height:100%;}
+h2 { font-weight: normal; font-size:25px;}
+.tagline a {display:block;border-top: 1px solid #757558; border-bottom: 1px solid #757558; line-height: 32px; margin:20px; }
+.tagline a:hover {border-top: 1px solid #cc9; border-bottom: 1px solid #cc9;}
+.side {float: left; width:220px; text-align:center; margin: 10px 10px 0 10px; min-height:100%; position:fixed;}
 .side ul {text-align:left;}
 a { color:#cc9; text-decoration: none;}
 a:hover  { text-decoration: underline;}
-.main {height:100%; margin:0px 10px 0px 230px; max-width:600px; overflow:scroll-y;}
-pre, pre code { font-family: 'Ubuntu Mono', monospace; font-size:15px;  }
-pre code {background:black; border:1px solid #757558; padding: 0 1em 1em; display:block;}
+.side a {color:#838363;}
+.side a:hover { text-decoration:none; color:#cc9;}
+.main {
+background-color:#212119;
+margin-left:240px;
+border:1px solid #212119; 
+border-left: 1px solid #757558;
+}
+.inner { margin:20px; max-width:690px; overflow:scroll-y;
+margin-bottom: 100%;}
+code { background:#11110D; text-shadow:none; font-family: 'Ubuntu Mono', monospace; padding: 5px; border-radius:10px; }
+pre code { border:1px solid #757558;  display:block; padding: 0 1em 1em; border-radius:0px;  }
 </style>
 </head>
 <body>
 
 <div class="side">
-<br />
-<img src="m4.png" width="200px"/>
-<h1> [CoM4] </h1>
-<p class="tagline">
-CommonJS Modules via M4
-</p>
-<ul>
-<li><a href="#intro">Introduction</a></li>
-<li><a href="#install">Installation</a></li>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#download">Download</a></li>
-</ul>
+  <br />
+  <h1><a href="#com4">[CoM4]</a></h1>
+  <p class="tagline"><a href="#com4">CommonJS Modules via M4</a></p>
+
+  <ul>
+    <li><a href="#install">Installation</a></li>
+    <li><a href="#usage">Usage</a></li>
+  </ul>
+  
+  <p class="tagline"><a href="#c4">C4: Modular JS Library</a></p>
+  
 </div>
 
-<div class="main">
+<div class="main"><div class="inner">
 
-<h2 id="intro">Introduction</h2>
+<h1 id="com4"> CoM4 </h1>
+  
 <p>
 CoM4 is a build-time implementation of 
 <a href="http://wiki.commonjs.org/wiki/Modules/1.1.1">
@@ -48,22 +58,18 @@ CommonJS Modules 1.1.1</a> built on the
 <a href="http://www.gnu.org/software/m4/">M4</a> macro preprocessor. 
 </p>
 
-<h2 id="download">Download</h2>
-<p>
-Download the latest version of CoM4 
-<a href="http://fixme">here</a>. 
-</p>
-
 <h2 id="install">Installation</h2>
 <p>
-Download the archive, extract it to a location of your choice, 
-set the executable flag on the file named "com4", 
-and create a symbolic link to it in your path. For example:
+Clone the git repository, 
+set the executable flag on <code>src/com4</code>, 
+and create a symbolic link to it in your path. 
+</p>
+<p>
+For example:
 <pre><code>
-cd ~
-tar -zxf com4.tgz
-chmod +x com4/com4
-sudo ln -s ~/com4/com4 /usr/bin/com4
+git clone git@github.com:gitbuh/com4.git ~/com4
+chmod +x ~/com4/src/com4
+sudo ln -s ~/com4/src/com4 /usr/bin/com4
 </code></pre>
 </p>
 
@@ -74,8 +80,7 @@ com4 -i &lt;infile.js&gt; -o &lt;outfile.js&gt;
 </code></pre>
 </p>
 
-</div>
 
+<h1 id="c4"> C4 </h1>
 
-</body>
-</html>
+</div></div></body></html>

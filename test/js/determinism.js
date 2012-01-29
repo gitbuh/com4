@@ -1,10 +1,10 @@
-function print(text){ console.log(text); }
-({modules:[ 
+function print(text) { console.log(text); }
+({modules: [
 
 //
 // ../program.js
 //
-function(require, module, exports){ 
+function(require,module,exports){
 var test = require(1);
 require(3);
 test.print('DONE', 'info');
@@ -13,7 +13,7 @@ test.print('DONE', 'info');
 //
 // ../test.js
 //
-function(require, module, exports){ 
+function(require,module,exports){
 
 exports.print = typeof print !== "undefined" ? print : function () {
     var system = require(2);
@@ -34,12 +34,12 @@ exports.assert = function (guard, message) {
 //
 // ../system.js
 //
-,// Module "../system.js" not found.
+0,// Module "../system.js" not found.
 
 //
 // ../submodule/a.js
 //
-function(require, module, exports){ 
+function(require,module,exports){
 var test = require(1);
 var pass = false;
 var test = require(1);
@@ -54,13 +54,13 @@ test.assert(pass, 'require does not fall back to relative modules when absolutes
 //
 // ../a.js
 //
-,// Module "../a.js" not found.
+0,// Module "../a.js" not found.
 
 //
 // CoM4 bootstrap
 //
 0],init:function(){
-var boot=this, exports=[], require=function(id){ return exports[id] || void boot.modules[id](require, id ? {id:id} : require.main, exports[id]={}) || exports[id]; };
+var boot=this, exports=[], require=function(id) { var fn=boot.modules[id]; return exports[id] || void fn(require, id ? {id:id} : require.main, exports[id]={}) || exports[id]; };
 require.main={id:0};
 return require(0);
 }}).init();
