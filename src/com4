@@ -3,18 +3,20 @@
 export program="CoM4"
 export usage="Usage: $0 -i <in_file.js> -o <out_file.js>";
 export com4_path="$( dirname $( readlink -f "$0" ))"
+export com4_includes="$com4_path/../inc"
 export included_files="included_files.tmp"
 export tmp_path="_tmp"
 export abs_path=""
 export rel_path=""
-export include=""
+export include="$com4_includes"
 export in_file=""
 export out_file=""
-export fail=0;
-export test_mode=0;
 export html=0;
-export var_global="window"
 export var_main=""
+export main_prefix=""
+export main_suffix=""
+export ext_prepend="h.js"
+export ext_append="x.js"
 
 . "$com4_path/include.sh"
 
@@ -34,15 +36,30 @@ if [ $html = 1 ]; then
   echo "<html><head><script>" >> "$out_file";
 fi
 
-if [ $test_mode = 1 ]; then
-  echo "function print(text) { console.log(text); }" >> "$out_file";
-fi
-
 if [ "$var_main" != "" ]; then
-  echo -n "$var_main = " >> "$out_file";
+  main_prefix="$var_main = ";
 fi
 
-echo "({modules: [">> "$out_file";
+echo "// 
+//  Packaged by $program
+//
+//  Main: $in_file
+//  User: `whoami` 
+//  Node: `uname -n`
+//  Date: `date`
+//
+//  Minify this script before deploying. 
+//  See http://code.google.com/closure/compiler/
+//
+
+//
+//  $program bootstrap
+//
+$main_prefix(function (m) {
+function r(n) { var f = m[n]; return f.e || void f(r, n ? {id: n} : r.main, f.e = {}) || f.e; }
+r.main = {id: 0};
+return r(0);
+}([" >> "$out_file";
 
 write_module "$id" 1 >> "$out_file";
 
@@ -52,15 +69,7 @@ for file in $( ls $tmp_path ); do
 
 done
 
-echo "
-//
-// $program bootstrap
-//
-0],init:function(){
-var boot=this, exports=[], require=function(id) { var fn=boot.modules[id]; return exports[id] || void fn(require, id ? {id:id} : require.main, exports[id]={}) || exports[id]; };
-require.main={id:0};
-return require(0);
-}}).init();" >> "$out_file";
+echo "]))$main_suffix;" >> "$out_file";
 
 if [ $html = 1 ]; then
   echo "</script></head><body></body></html>" >> "$out_file";

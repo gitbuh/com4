@@ -1,0 +1,2 @@
+exports.RNG = RNG;
+

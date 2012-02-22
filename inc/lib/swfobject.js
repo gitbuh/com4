@@ -1,4 +1,4 @@
-require('./swfobject/swfobject/src/swfobject', 'inline');
+COM4_IMPORT('./swfobject/swfobject/src/swfobject');
 
-var k; for (k in swfobject) exports[k]=swfobject[k];
+COM4_EXPORT_PROPS(swfobject);
 

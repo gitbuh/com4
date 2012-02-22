@@ -1,22 +1,31 @@
-get_options ()
-{
-  while getopts "i:o:g:m:I:th" opt; do
+get_options () {
+
+  fail=0
+
+  while getopts "i:o:thm:I:a:p:" opt; do
     
     case "$opt" in
       i)
-        in_file="$OPTARG";;
+        in_file="$OPTARG"
+        ;;
       o)
-        out_file="$OPTARG";;
-      g)
-        var_global="$OPTARG";;
-      I)
-        include="$OPTARG";; # TODO: -I / include dirs
-      t)
-        test_mode=1;;
+        out_file="$OPTARG"
+        ;;
       h)
-        html=1;;
+        html=1
+        ;;
       m)
-        var_main="$OPTARG";;
+        var_main="$OPTARG"
+        ;;
+      I)
+        include="$OPTARG $com4_includes"
+        ;; # TODO: -I / include dirs
+      a)
+        ext_append="$OPTARG"
+        ;;
+      p)
+        ext_prepend="$OPTARG"
+        ;;
       [?])
         fail=1;;
     esac
@@ -39,38 +48,83 @@ get_options ()
   fi
 }
 
-normalize_path ()
-{
-  echo "$(cd $(dirname "$1"); echo $PWD/$(basename "$1"))"
+
+
+resolve_path () {
+
+  if [ "$2" = "" ]; then
+    ext=".js"
+  else
+    ext=""
+  fi
+
+  # absolute path
+  if [ "`echo $1 | egrep '^\.\.?/'`" = "" ]; then
+  
+    # always try main module's directory first
+    path="`normalize_path "$abs_path/$1$ext"`"
+    
+    # if it's not packaged with the main module, check include paths
+    if [ ! -e "$path" ]; then
+    
+      for inc in $include; do
+        path="`normalize_path "$inc/$1$ext"`"
+        
+        if [ -e "$path" ]; then
+          echo -n "$path"
+          return
+        fi
+        
+      done
+    
+    fi
+    
+  # relative path, don't check includes
+  else
+  
+    path="`normalize_path "$rel_path/$1$ext"`"
+    
+  fi
+  
+  echo -n "$path"
 }
 
-write_module ()
-{
+normalize_path () {
+  echo "$(cd `dirname "$1"` > /dev/null 2>&1; echo $PWD/`basename "$1"`)"
+}
 
-  if [ "`echo $1 | egrep '^\.\.?/'`" = "" ]; then
-    path=$(normalize_path "$abs_path/$1.js")
-  else
-    path=$(normalize_path "$rel_path/$1.js")
-  fi
+import_file () {
+  path="`resolve_path "$1"`"
+  echo -n "`cat "$path"`"
+}
+
+get_header_path () {
+  echo "`dirname "$1"`/`basename "$1" .js`.$ext_prepend"
+}
+
+get_footer_path () {
+  echo "`dirname "$1"`/`basename "$1" .js`.$ext_append"
+}
+
+write_module () {
+
+  path="`resolve_path "$1"`"
   
   module_name=`abs_to_rel "$abs_path" "$path"`
-  
-  loaded=0
-  old_path="$rel_path"
-  rel_path=$( dirname "$path" )
-  
-  if [ "$2" = "inline" ]; then
-    echo -n "`cat "$path"`"
-    return
-  fi
-  
-  count=0
   
   if [ $2 ]; then
     require="require";
   else
-    require="[_require_]";
+    require="|COM4_LQ|require|COM4_RQ|";
   fi
+  
+  if [ ! -e "$path" ]; then
+    echo "Warning: Module \"$module_name\" not found. ($1)" >&2
+    echo -n "$require(-1)"
+    return
+  fi
+  
+  count=0
   
   for included in `cat $included_files`; do
     count=$(( $count + 1 ))
@@ -82,40 +136,59 @@ write_module ()
   done
   
   tmp_file="$tmp_path/$count"
-  
-  if [ "$2" = "" ]; then
-    echo -n "$require($count)"
-  fi
+  old_path="$rel_path"
+  rel_path=$( dirname "$path" )
+  note=""
   
   echo -n > "$tmp_file";
   echo "$path" >> "$included_files"
-
+  
+  if [ "$2" = "" ]; then
+    echo -n "$require($count)"
+    echo ", " >> "$tmp_file"
+  else
+    note="(main module)"
+  fi
+  
+  echo "function (require, module, exports) {" >> "$tmp_file"
+  
+  header="`get_header_path "$path"`"
+  footer="`get_footer_path "$path"`"
+  
+  if [ -e "$header" ]; then  
+    echo "
+//
+//  Module $count header: `abs_to_rel "$abs_path" "$header"`
+//" >> "$tmp_file"
+    m4 -P "$com4_path/macros.m4" "$header" >> "$tmp_file"
+  fi
+  
   echo "
 //
-// $module_name
+//  Module $count: $module_name $note
 //" >> "$tmp_file"
 
+  m4 -P "$com4_path/macros.m4" "$path" >> "$tmp_file"
   
-  if [ -e "$path" ]; then
-  
-    echo "function(require,module,exports){" >> "$tmp_file"
-    m4 -P "$com4_path/macros.m4" "$path" >> "$tmp_file"
-    echo "},"  >> "$tmp_file"
-  
-  else
-  
-    echo "0,// Module \"$module_name\" not found." >> "$tmp_file"
-    echo "Warning: Module \"$module_name\" not found." >&2
-  
+  if [ -e "$footer" ]; then
+    echo "
+//
+//  Module $count footer: `abs_to_rel "$abs_path" "$footer"`
+//" >> "$tmp_file"
+    m4 -P "$com4_path/macros.m4" "$footer" >> "$tmp_file"
   fi
+  
+  echo -n "
+//  Module $count end.
+}"  >> "$tmp_file"
+  
   
   rel_path="$old_path"
 }
 
 # both $1 and $2 are absolute paths
 # returns $2 relative to $1
-abs_to_rel () 
-{
+abs_to_rel ()  {
   source=$1
   target=$2
 
@@ -127,4 +200,29 @@ abs_to_rel ()
   done
 
   echo ${back}${target#$common_part/}
+}
+
+# filters
+
+url_encode () { 
+  sed ' s/ /%20/g;
+        s/!/%21/g;
+        s/"/%22/g;
+        s/#/%23/g;
+        s/\$/%24/g;
+        s/\&/%26/g;
+        s/'\''/%27/g;
+        s/(/%28/g;
+        s/)/%29/g;
+        s/:/%3A/g'
+}
+
+url_decode () {
+  sed -e's/%\([0-9A-F][0-9A-F]\)/\\\\\x\1/g' | xargs echo -e
+}
+
+stringify_text () {
+
+sed 's/\\/\\\\\\\\/g ; s/"/\\"/g ; s/^/"/ ; s/$/\\\\n" +/ ; $s/..$// '
+
 }

@@ -1,16 +1,17 @@
 <!DOCTYPE HTML> 
 <html>
 <head>
-<link href='http://fonts.googleapis.com/css?family=Play|Ubuntu+Mono' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Play|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
 <style>
 body, html { margin:0; padding:0; }
 body { 
   background:#000; color:#838363; font-size:14px; font-family:'Play', 'Helvetica', sans-serif; 
-  text-shadow:1px 1px 2px #000;
+  text-shadow:1px 1px 2px #000; line-height:150%;
 }
 h1, h2 { color: #494937; }
 h1 { font-weight: bold; font-size: 60px; margin:0; padding:0; line-height:100%;}
 h2 { font-weight: normal; font-size:25px;}
+h3 { font-weight: normal; font-size:18px; font-style:italic;}
 .tagline a {display:block;border-top: 1px solid #757558; border-bottom: 1px solid #757558; line-height: 32px; margin:20px; }
 .tagline a:hover {border-top: 1px solid #cc9; border-bottom: 1px solid #cc9;}
 .side {float: left; width:220px; text-align:center; margin: 10px 10px 0 10px; min-height:100%; position:fixed;}
@@ -27,8 +28,11 @@ border-left: 1px solid #757558;
 }
 .inner { margin:20px; max-width:690px; overflow:scroll-y;
 margin-bottom: 100%;}
-code { background:#11110D; text-shadow:none; font-family: 'Ubuntu Mono', monospace; padding: 5px; border-radius:10px; }
+code { background:#11110D; text-shadow:none; font-family: 'Droid Sans Mono', monospace; padding: 5px; border-radius:10px; }
 pre code { border:1px solid #757558;  display:block; padding: 0 1em 1em; border-radius:0px;  }
+dt{position: relative; top: 1.5em;}
+dd{margin:-1px 40px;}
+
 </style>
 </head>
 <body>
@@ -41,9 +45,19 @@ pre code { border:1px solid #757558;  display:block; padding: 0 1em 1em; border-
   <ul>
     <li><a href="#install">Installation</a></li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#macros">Macros</a></li>
   </ul>
   
   <p class="tagline"><a href="#c4">C4: Modular JS Library</a></p>
+  
+  
+  <p class="tagline"><a href="#c4">Third-Party Libraries</a></p>
+  
+  <ul>
+    <li><a href="#calendar">Calendar</a></li>
+    <li><a href="#highlight">Highlight</a></li>
+    <li><a href="#swfobject">SWFObject</a></li>
+  </ul>
   
 </div>
 
@@ -74,11 +88,98 @@ sudo ln -s ~/com4/src/com4 /usr/bin/com4
 </p>
 
 <h2 id="usage">Usage</h2>
+
+<code>com4</code> Accepts a single input module 
+(which may require more modules) and produces
+a single output file.
+
+<h3>Examples</h3>
+
 <p>
+
+Normal <code>com4</code> use looks like this:
+
 <pre><code>
-com4 -i &lt;infile.js&gt; -o &lt;outfile.js&gt;
+com4 -i path/to/main/module -o path/to/outfile.js
 </code></pre>
 </p>
+
+<p>
+
+This example stores the main module's <code>exports</code>
+in a global variable called "myMod". 
+
+<pre><code>
+com4 -m "var myMod" -i path/to/main/module -o path/to/outfile.js
+</code></pre>
+</p>
+
+<p>
+
+For convenience, <code>com4</code> can wrap the script in an HTML document.
+
+<pre><code>
+com4 -h -i path/to/main/module -o path/to/outfile.html
+</code></pre>
+</p>
+
+<h3>Switches</h3>
+
+<dl>
+
+<dt> <code>-i</code> </dt>
+<dd> Input (required). Path to main module. </dd>
+<dt> <code>-o</code> </dt>
+<dd> Output (required). Path to compiled javascript file. </dd>
+<dt> <code>-m</code> </dt>
+<dd> Main. Store the main module's <code>exports</code> here. </dd>
+<dt> <code>-h</code> </dt>
+<dd> HTML. Wrap javascript output in an html document. </dd>
+
+</dl>
+
+<h2 id="macros">Macros</h2>
+
+<p>
+CoM4 provides a few macros to facilitate wrapping third-party scripts. 
+These macros should only be used for wrapping third-party scripts. 
+Don't use them in your own modules.
+</p>
+
+<p>
+See the scripts in <code>inc/lib/</code> for examples of how to use these macros.
+</p>
+
+<h3>COM4_IMPORT</h3>
+<p>
+The <code>COM4_IMPORT</code> macro inlines an external javascript file.
+</p>
+
+<pre><code>
+COM4_IMPORT("path/to/module");
+</code></pre>
+
+<h3>COM4_EXPORT</h3>
+
+<p>
+The <code>COM4_EXPORT</code> macro exports an individual value.
+</p>
+
+<pre><code>
+COM4_EXPORT(identifier, "optionalPropertyName");
+</code></pre>
+
+<h3>COM4_EXPORT_PROPS</h3>
+
+<p>
+The <code>COM4_EXPORT_PROPS</code> macro exports all properties of an object.
+</p>
+
+<pre><code>
+COM4_EXPORT_PROPS(object);
+</code></pre>
+
+
 
 
 <h1 id="c4"> C4 </h1>

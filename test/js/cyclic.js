@@ -1,13 +1,33 @@
-function print(text) { console.log(text); }
-({modules: [
+// 
+//  Packaged by CoM4
+//
+//  Main: program
+//  User: owner 
+//  Node: vaio-fs
+//  Date: Sat Feb  4 05:16:44 EST 2012
+//
+//  Minify this script before deploying. 
+//  See http://code.google.com/closure/compiler/
+//
 
 //
-// ../program.js
+//  CoM4 bootstrap
 //
-function(require,module,exports){
+(function (m) {
+    function r(n) {
+        var f = m[n];
+        return f.e || void f(r, n ? {id: n} : r.main, f.e = {}) || f.e;
+    }
+    r.main = {id: 0};
+    return r(0);
+}([
+function (require, module, exports) {
+//
+//  Module 0: ../program.js (main module)
+//
 var test = require(1);
-var a = require(3);
-var b = require(4);
+var a = require(2);
+var b = require(3);
 
 test.assert(a.a, 'a exists');
 test.assert(b.b, 'b exists')
@@ -15,15 +35,16 @@ test.assert(a.a().b === b.b, 'a gets b');
 test.assert(b.b().a === a.a, 'b gets a');
 
 test.print('DONE', 'info');
-},
 
+//  Module 0 EOF
+}, 
+function (require, module, exports) {
 //
-// ../test.js
+//  Module 1: ../test.js 
 //
-function(require,module,exports){
 
 exports.print = typeof print !== "undefined" ? print : function () {
-    var system = require(2);
+    var system = require(-1);
     var stdio = system.stdio;
     stdio.print.apply(stdio, arguments);
 };
@@ -36,38 +57,28 @@ exports.assert = function (guard, message) {
     }
 };
 
-},
 
+//  Module 1 EOF
+}, 
+function (require, module, exports) {
 //
-// ../system.js
+//  Module 2: ../a.js 
 //
-0,// Module "../system.js" not found.
-
-//
-// ../a.js
-//
-function(require,module,exports){
 exports.a = function () {
     return b;
 };
-var b = require(4);
-},
+var b = require(3);
 
+//  Module 2 EOF
+}, 
+function (require, module, exports) {
 //
-// ../b.js
+//  Module 3: ../b.js 
 //
-function(require,module,exports){
-var a = require(3);
+var a = require(2);
 exports.b = function () {
     return a;
 };
-},
 
-//
-// CoM4 bootstrap
-//
-0],init:function(){
-var boot=this, exports=[], require=function(id) { var fn=boot.modules[id]; return exports[id] || void fn(require, id ? {id:id} : require.main, exports[id]={}) || exports[id]; };
-require.main={id:0};
-return require(0);
-}}).init();
+//  Module 3 EOF
+}]));

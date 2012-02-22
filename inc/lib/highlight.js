@@ -1,4 +1,4 @@
-require('./highlight/src/highlight', 'inline');
+COM4_IMPORT('./highlight/src/highlight');
 
-for (var k in hljs) exports[k]=hljs[k];
+COM4_EXPORT_PROPS(hljs);
 

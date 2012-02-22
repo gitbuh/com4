@@ -4,3 +4,9 @@
 [submodule "inc/lib/swfobject"]
 	path = inc/lib/swfobject
 	url = https://github.com/swfobject/swfobject.git
+[submodule "inc/lib/calendar"]
+	path = inc/lib/calendar
+	url = https://github.com/1Marc/javascript-clean-calendar.git
+[submodule "inc/lib/notifier"]
+	path = inc/lib/notifier
+	url = https://github.com/gitbuh/notifer.js
