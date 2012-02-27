@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export program="CoM4"
-export usage="Usage: $0 -i <in_file.js> -o <out_file.js>";
-export com4_path="$( dirname $( readlink -f "$0" ))"
+export usage="Usage: $0 -i <in_file.js> -o <out_file.js>"
+export com4_path="$(dirname $(readlink -f "$0"))"
 export com4_includes="$com4_path/../inc"
 export included_files="included_files.tmp"
 export tmp_path="_tmp"
@@ -11,6 +11,7 @@ export rel_path=""
 export include="$com4_includes"
 export in_file=""
 export out_file=""
+export linked_file="/dev/null"
 export html=0;
 export var_main=""
 export main_prefix=""
@@ -27,26 +28,28 @@ mkdir "$tmp_path"
 echo -n > "$out_file"
 echo -n > "$included_files"
 
-abs_path="`normalize_path $( dirname "$in_file" )`"; 
-rel_path="$abs_path"; 
+abs_path="$(normalize_path $(dirname "$in_file"))"
+rel_path="$abs_path"
 
-id="`basename "$in_file"`";
+id="$(basename "$in_file")"
 
 if [ $html = 1 ]; then
-  echo "<html><head><script>" >> "$out_file";
+  echo "<html><head><script>" >> "$out_file"
 fi
 
+echo "</body></html>" >> "$linked_file"
+
 if [ "$var_main" != "" ]; then
-  main_prefix="$var_main = ";
+  main_prefix="$var_main = "
 fi
 
 echo "// 
 //  Packaged by $program
 //
 //  Main: $in_file
-//  User: `whoami` 
-//  Node: `uname -n`
-//  Date: `date`
+//  User: $(whoami) 
+//  Node: $(uname -n)
+//  Date: $(date)
 //
 //  Minify this script before deploying. 
 //  See http://code.google.com/closure/compiler/
@@ -59,21 +62,27 @@ $main_prefix(function (m) {
 function r(n) { var f = m[n]; return f.e || void f(r, n ? {id: n} : r.main, f.e = {}) || f.e; }
 r.main = {id: 0};
 return r(0);
-}([" >> "$out_file";
+}([" >> "$out_file"
 
-write_module "$id" 1 >> "$out_file";
+write_module "$id" 1 >> "$out_file"
 
 for file in $( ls $tmp_path ); do
 
-  cat "$tmp_path/$file" >> "$out_file";
+  cat "$tmp_path/$file" >> "$out_file"
 
 done
 
-echo "]))$main_suffix;" >> "$out_file";
+echo "]))$main_suffix;" >> "$out_file"
 
 if [ $html = 1 ]; then
-  echo "</script></head><body></body></html>" >> "$out_file";
+  echo "</script></head><body></body></html>" >> "$out_file"
 fi
+
+echo "<html><head></head><body>" >> "$linked_file"
+
+cat "$linked_file" 2> /dev/null > "$linked_file.tmp" 
+tac "$linked_file.tmp" 2> /dev/null > "$linked_file"
+rm "$linked_file.tmp" 2> /dev/null
 
 rm "$included_files"
 rm -r "$tmp_path"

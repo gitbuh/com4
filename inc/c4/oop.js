@@ -1,3 +1,5 @@
+function oop() {}
+
 /** declare
 
     Create a prototype object and return its constructor.
